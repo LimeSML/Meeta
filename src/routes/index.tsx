@@ -1,3 +1,4 @@
+import { MarkdownPreview } from '#/components/markdown/MarkdownPreview'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,12 +18,7 @@ import {
   CardTitle,
 } from '#/components/ui/card'
 import { deleteNoteFn, getNotesFn } from '#/db/queries'
-import {
-  createFileRoute,
-  Link,
-  useLoaderData,
-  useRouter,
-} from '@tanstack/react-router'
+import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import {
   Calendar,
@@ -137,7 +133,13 @@ function App() {
 
                   <CardContent className="flex-1 px-6 py-2 overflow-hidden relative">
                     <div className="prose prose-sm prose-slate line-clamp-[8] opacity-70 text-slate-600 break-words leading-relaxed">
-                      <ReactMarkdown>{note.content}</ReactMarkdown>
+                      {note.content ? (
+                        <MarkdownPreview content={note.content} />
+                      ) : (
+                        <p className="text-gray-400 text-sm">
+                          内容がありません
+                        </p>
+                      )}
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
                   </CardContent>

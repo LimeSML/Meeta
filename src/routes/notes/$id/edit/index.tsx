@@ -1,3 +1,4 @@
+import { MarkdownPreview } from '#/components/markdown/MarkdownPreview'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
@@ -105,7 +106,13 @@ function RouteComponent() {
               Preview
             </div>
             <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
-              <ReactMarkdown>{content}</ReactMarkdown>
+              {content ? (
+                <MarkdownPreview content={content} />
+              ) : (
+                <p className="text-gray-300 text-sm">
+                  プレビューが表示されます
+                </p>
+              )}
             </div>
           </div>
         </div>

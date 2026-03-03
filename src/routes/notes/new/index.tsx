@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Save, ChevronLeft, Eye, PenLine, Loader2 } from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
 import { createNoteFn, incrementActivityCountFn } from '#/db/queries'
+import { MarkdownPreview } from '#/components/markdown/MarkdownPreview'
 
 export const Route = createFileRoute('/notes/new/')({
   component: RouteComponent,
@@ -98,7 +99,7 @@ function RouteComponent() {
             </div>
             <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
               {content ? (
-                <ReactMarkdown>{content}</ReactMarkdown>
+                <MarkdownPreview content={content} />
               ) : (
                 <p className="text-gray-300 text-sm">
                   プレビューが表示されます
