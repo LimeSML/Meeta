@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NotesNewIndexRouteImport } from './routes/notes/new/index'
+import { Route as NotesIdEditIndexRouteImport } from './routes/notes/$id/edit/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const NotesNewIndexRoute = NotesNewIndexRouteImport.update({
   path: '/notes/new/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesIdEditIndexRoute = NotesIdEditIndexRouteImport.update({
+  id: '/notes/$id/edit/',
+  path: '/notes/$id/edit/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/notes/new/': typeof NotesNewIndexRoute
+  '/notes/$id/edit/': typeof NotesIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/notes/new': typeof NotesNewIndexRoute
+  '/notes/$id/edit': typeof NotesIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/notes/new/': typeof NotesNewIndexRoute
+  '/notes/$id/edit/': typeof NotesIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/notes/new/'
+  fullPaths: '/' | '/notes/new/' | '/notes/$id/edit/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/notes/new'
-  id: '__root__' | '/' | '/notes/new/'
+  to: '/' | '/notes/new' | '/notes/$id/edit'
+  id: '__root__' | '/' | '/notes/new/' | '/notes/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   NotesNewIndexRoute: typeof NotesNewIndexRoute
+  NotesIdEditIndexRoute: typeof NotesIdEditIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesNewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/$id/edit/': {
+      id: '/notes/$id/edit/'
+      path: '/notes/$id/edit'
+      fullPath: '/notes/$id/edit/'
+      preLoaderRoute: typeof NotesIdEditIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NotesNewIndexRoute: NotesNewIndexRoute,
+  NotesIdEditIndexRoute: NotesIdEditIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

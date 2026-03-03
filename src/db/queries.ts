@@ -3,6 +3,7 @@ import { db } from "."
 import z from "zod"
 import { notes } from "./schema"
 import { eq } from "drizzle-orm"
+import { notFound } from "@tanstack/react-router"
 
 export const getActivitiesThirtyDaysFn = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -27,6 +28,19 @@ export const getNotesFn = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+export const getNoteByIdFn = createServerFn({ method: 'GET' }).inputValidator(z.object({ id: z.string() })).handler(
+  async ({ data }) => {
+    const note = await db.query.notes.findFirst({
+      where: eq(notes.id, data.id),
+    })
+
+    if (note == null) {
+      throw notFound();
+    }
+    return note
+  },
+)
+
 export const createNoteFn = createServerFn({ method: 'POST' }).inputValidator(z.object({ title: z.string(), content: z.string() })).handler(
   async ({ data }) => {
     const newNote = await db.insert(notes).values({
@@ -36,6 +50,19 @@ export const createNoteFn = createServerFn({ method: 'POST' }).inputValidator(z.
     }).returning()
 
     return newNote
+  },
+)
+
+export const updateNoteFn = createServerFn({ method: 'POST' }).inputValidator(z.object({ id: z.string(), title: z.string(), content: z.string() })).handler(
+  async ({ data }) => {
+    const { id, title, content } = data
+    const updatedNote = await db.update(notes).set({
+      title,
+      content,
+      updatedAt: new Date(),
+    }).where(eq(notes.id, id)).returning()
+
+    return updatedNote
   },
 )
 

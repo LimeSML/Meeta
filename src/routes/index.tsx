@@ -45,7 +45,7 @@ function App() {
   // 削除ダイアログを表示するためのステート
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null)
 
-  const notes = useLoaderData({ from: '/' })
+  const notes = Route.useLoaderData()
   const deleteNoteServerFn = useServerFn(deleteNoteFn)
   const router = useRouter()
 
@@ -97,8 +97,8 @@ function App() {
             {notes.map((note) => (
               <Link
                 key={note.id}
-                to="/notes/$noteId"
-                params={{ noteId: note.id }}
+                to="/notes/$id/edit"
+                params={{ id: note.id }}
                 className="group block relative"
               >
                 <Card className="h-[350px] flex flex-col border-slate-200 shadow-sm group-hover:shadow-md group-hover:border-primary/30 transition-all duration-300 overflow-hidden bg-white">

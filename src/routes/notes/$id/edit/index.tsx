@@ -1,32 +1,42 @@
+import { Button } from '#/components/ui/button'
+import { Input } from '#/components/ui/input'
+import { Textarea } from '#/components/ui/textarea'
+import { getNoteByIdFn, updateNoteFn } from '#/db/queries'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useServerFn } from '@tanstack/react-start'
+import { ChevronLeft, Eye, Loader2, PenLine, Save } from 'lucide-react'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { Save, ChevronLeft, Eye, PenLine, Loader2 } from 'lucide-react'
-import { useServerFn } from '@tanstack/react-start'
-import { createNoteFn } from '#/db/queries'
 
-export const Route = createFileRoute('/notes/new/')({
+export const Route = createFileRoute('/notes/$id/edit/')({
   component: RouteComponent,
+  loader: ({ params }) => getNoteByIdFn({ data: { id: params.id } }),
 })
 
 function RouteComponent() {
-  const createNoteServerFn = useServerFn(createNoteFn)
+  const initialNote = Route.useLoaderData()
+  const updateNoteServerFn = useServerFn(updateNoteFn)
   const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+
+  const [title, setTitle] = useState(initialNote.title)
+  const [content, setContent] = useState(initialNote.content)
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleSave = async () => {
+  const handleUpdate = async () => {
     try {
       setIsSaving(true)
-      await createNoteServerFn({ data: { title, content } })
+      await updateNoteServerFn({
+        data: {
+          id: initialNote.id,
+          title,
+          content,
+        },
+      })
+      // 更新後は一覧、または詳細ページへ戻る
       navigate({ to: '/' })
     } catch (error) {
-      console.error('Error creating note:', error)
-      alert('メモの保存に失敗しました。')
+      console.error('Error updating note:', error)
+      alert('メモの更新に失敗しました。')
     } finally {
       setIsSaving(false)
     }
@@ -35,7 +45,6 @@ function RouteComponent() {
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-4 flex flex-col justify-center">
       <div className="page-wrap flex flex-col h-[88vh] min-h-[700px] bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        {/* ツールバー */}
         <header className="w-full bg-white border-b border-gray-200 shrink-0">
           <div className="flex items-center justify-between px-6 py-3">
             <div className="flex items-center gap-2 flex-1">
@@ -43,7 +52,7 @@ function RouteComponent() {
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:bg-gray-100 h-9 w-9 shrink-0"
-                onClick={() => navigate({ to: '/' })}
+                onClick={() => window.history.back()}
               >
                 <ChevronLeft className="w-5 h-5 text-gray-500" />
               </Button>
@@ -56,9 +65,13 @@ function RouteComponent() {
             </div>
 
             <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+                更新:{' '}
+                {new Date(initialNote.updatedAt).toLocaleDateString('ja-JP')}
+              </span>
               <Button
                 className="bg-primary hover:bg-primary/90 text-white gap-2 shadow-sm px-5 h-9 rounded-lg font-medium cursor-pointer"
-                onClick={handleSave}
+                onClick={handleUpdate}
                 disabled={isSaving}
               >
                 {isSaving ? (
@@ -92,13 +105,7 @@ function RouteComponent() {
               Preview
             </div>
             <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
-              {content ? (
-                <ReactMarkdown>{content}</ReactMarkdown>
-              ) : (
-                <p className="text-gray-300 text-sm">
-                  プレビューが表示されます
-                </p>
-              )}
+              <ReactMarkdown>{content}</ReactMarkdown>
             </div>
           </div>
         </div>
