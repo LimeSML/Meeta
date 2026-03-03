@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { db } from "."
 import z from "zod"
 import { notes } from "./schema"
+import { eq } from "drizzle-orm"
 
 export const getActivitiesThirtyDaysFn = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -36,4 +37,11 @@ export const createNoteFn = createServerFn({ method: 'POST' }).inputValidator(z.
 
     return newNote
   },
+)
+
+export const deleteNoteFn = createServerFn({ method: 'POST' }).inputValidator(z.object({ id: z.string() })).handler(
+  async ({ data }) => {
+    await db.delete(notes).where(eq(notes.id, data.id));
+    return { success: true }
+  }
 )
