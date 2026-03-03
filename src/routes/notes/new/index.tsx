@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button } from '@/components/ui/button'
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Save, ChevronLeft, Eye, PenLine, Loader2 } from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
-import { createNoteFn } from '#/db/queries'
+import { createNoteFn, incrementActivityCountFn } from '#/db/queries'
 
 export const Route = createFileRoute('/notes/new/')({
   component: RouteComponent,
@@ -14,6 +14,8 @@ export const Route = createFileRoute('/notes/new/')({
 
 function RouteComponent() {
   const createNoteServerFn = useServerFn(createNoteFn)
+  const incrementActivity = useServerFn(incrementActivityCountFn)
+  const router = useRouter()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -23,6 +25,9 @@ function RouteComponent() {
     try {
       setIsSaving(true)
       await createNoteServerFn({ data: { title, content } })
+      await incrementActivity({ data: { amount: 3 } })
+      // ルーターのキャッシュを無効化してヘッダーの「草」を再取得させる
+      await router.invalidate()
       navigate({ to: '/' })
     } catch (error) {
       console.error('Error creating note:', error)

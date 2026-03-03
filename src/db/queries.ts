@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "."
 import z from "zod"
-import { notes } from "./schema"
-import { eq } from "drizzle-orm"
+import { activities, notes } from "./schema"
+import { eq, sql } from "drizzle-orm"
 import { notFound } from "@tanstack/react-router"
 
 export const getActivitiesThirtyDaysFn = createServerFn({ method: 'GET' }).handler(
@@ -19,6 +19,27 @@ export const getActivitiesThirtyDaysFn = createServerFn({ method: 'GET' }).handl
     })
   },
 )
+
+export const incrementActivityCountFn = createServerFn({ method: 'POST' }).inputValidator(z.object({ amount: z.number().min(1) })).handler(async ({ data }) => {
+  // 今日の日付を取得 (YYYY-MM-DD)
+  const today = new Date().toISOString().split('T')[0]
+
+  await db
+    .insert(activities)
+    .values({
+      date: today,
+      count: data.amount,
+    })
+    .onConflictDoUpdate({
+      target: activities.date,
+      set: {
+        count: sql`${activities.count} + ${data.amount}`,
+      },
+    })
+
+  return { success: true }
+})
+
 
 export const getNotesFn = createServerFn({ method: 'GET' }).handler(
   async () => {
