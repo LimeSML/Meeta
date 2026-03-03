@@ -214,7 +214,7 @@ pre code {
 }
 
 .page-wrap {
-  width: min(1080px, calc(100% - 2rem));
+  width: min(1600px, calc(100% - 2rem));
   margin-inline: auto;
 }
 
