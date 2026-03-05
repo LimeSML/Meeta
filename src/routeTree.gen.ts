@@ -10,12 +10,36 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTranslateRouteImport } from './routes/api/translate'
+import { Route as ApiSummarizeRouteImport } from './routes/api/summarize'
+import { Route as ApiExplainRouteImport } from './routes/api/explain'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as NotesNewIndexRouteImport } from './routes/notes/new/index'
 import { Route as NotesIdEditIndexRouteImport } from './routes/notes/$id/edit/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTranslateRoute = ApiTranslateRouteImport.update({
+  id: '/api/translate',
+  path: '/api/translate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSummarizeRoute = ApiSummarizeRouteImport.update({
+  id: '/api/summarize',
+  path: '/api/summarize',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExplainRoute = ApiExplainRouteImport.update({
+  id: '/api/explain',
+  path: '/api/explain',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesNewIndexRoute = NotesNewIndexRouteImport.update({
@@ -31,30 +55,68 @@ const NotesIdEditIndexRoute = NotesIdEditIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/explain': typeof ApiExplainRoute
+  '/api/summarize': typeof ApiSummarizeRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/notes/new/': typeof NotesNewIndexRoute
   '/notes/$id/edit/': typeof NotesIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/explain': typeof ApiExplainRoute
+  '/api/summarize': typeof ApiSummarizeRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/notes/new': typeof NotesNewIndexRoute
   '/notes/$id/edit': typeof NotesIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/explain': typeof ApiExplainRoute
+  '/api/summarize': typeof ApiSummarizeRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/notes/new/': typeof NotesNewIndexRoute
   '/notes/$id/edit/': typeof NotesIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/notes/new/' | '/notes/$id/edit/'
+  fullPaths:
+    | '/'
+    | '/api/chat'
+    | '/api/explain'
+    | '/api/summarize'
+    | '/api/translate'
+    | '/notes/new/'
+    | '/notes/$id/edit/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/notes/new' | '/notes/$id/edit'
-  id: '__root__' | '/' | '/notes/new/' | '/notes/$id/edit/'
+  to:
+    | '/'
+    | '/api/chat'
+    | '/api/explain'
+    | '/api/summarize'
+    | '/api/translate'
+    | '/notes/new'
+    | '/notes/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/chat'
+    | '/api/explain'
+    | '/api/summarize'
+    | '/api/translate'
+    | '/notes/new/'
+    | '/notes/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiChatRoute: typeof ApiChatRoute
+  ApiExplainRoute: typeof ApiExplainRoute
+  ApiSummarizeRoute: typeof ApiSummarizeRoute
+  ApiTranslateRoute: typeof ApiTranslateRoute
   NotesNewIndexRoute: typeof NotesNewIndexRoute
   NotesIdEditIndexRoute: typeof NotesIdEditIndexRoute
 }
@@ -66,6 +128,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/translate': {
+      id: '/api/translate'
+      path: '/api/translate'
+      fullPath: '/api/translate'
+      preLoaderRoute: typeof ApiTranslateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/summarize': {
+      id: '/api/summarize'
+      path: '/api/summarize'
+      fullPath: '/api/summarize'
+      preLoaderRoute: typeof ApiSummarizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/explain': {
+      id: '/api/explain'
+      path: '/api/explain'
+      fullPath: '/api/explain'
+      preLoaderRoute: typeof ApiExplainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes/new/': {
@@ -87,6 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiChatRoute: ApiChatRoute,
+  ApiExplainRoute: ApiExplainRoute,
+  ApiSummarizeRoute: ApiSummarizeRoute,
+  ApiTranslateRoute: ApiTranslateRoute,
   NotesNewIndexRoute: NotesNewIndexRoute,
   NotesIdEditIndexRoute: NotesIdEditIndexRoute,
 }
