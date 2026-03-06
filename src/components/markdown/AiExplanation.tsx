@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react'
+import { Lightbulb } from 'lucide-react'
 import React from 'react'
 import { Button } from '../ui/button'
 import { fetchServerSentEvents, useChat } from '@tanstack/ai-react'
@@ -39,9 +39,9 @@ export function AiExplanation({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="my-6 rounded-xl border border-amber-100 overflow-hidden shadow-sm not-prose">
+    <div className="my-6 rounded-xl border border-amber-100 overflow-hidden shadow-sm">
       <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-widest border-b border-amber-100">
-        <Sparkles className="w-3 h-3" />
+        <Lightbulb className="w-3 h-3" />
         AI解説
       </div>
       <div className="px-5 py-4 text-slate-700 text-sm leading-relaxed">
@@ -65,7 +65,7 @@ export function AiExplanation({ children }: { children: React.ReactNode }) {
           disabled={isLoading}
           className="h-7 text-[10px] text-amber-600 hover:bg-amber-100/50 gap-1 cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Lightbulb className="w-3.5 h-3.5" />
           {isLoading ? '解説中...' : '解説する'}
         </Button>
       </div>

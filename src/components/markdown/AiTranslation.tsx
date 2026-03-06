@@ -39,7 +39,7 @@ export function AiTranslation({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="my-6 rounded-xl border border-blue-100 overflow-hidden not-prose">
+    <div className="my-6 rounded-xl border border-blue-100 overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest border-b border-blue-100">
         <Languages className="w-3 h-3" />
         AI翻訳

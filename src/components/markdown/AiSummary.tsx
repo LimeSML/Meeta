@@ -39,7 +39,7 @@ export function AiSummary({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="my-6 rounded-xl border border-emerald-100 overflow-hidden shadow-sm not-prose">
+    <div className="my-6 rounded-xl border border-emerald-100 overflow-hidden shadow-sm">
       <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest border-b border-emerald-100">
         <AlignLeft className="w-3 h-3" />
         AI要約

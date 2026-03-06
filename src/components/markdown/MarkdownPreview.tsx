@@ -7,8 +7,14 @@ import type { ContainerDirective, LeafDirective } from 'mdast-util-directive'
 import { AiTranslation } from './AiTranslation'
 import { AiExplanation } from './AiExplanation'
 import { AiSummary } from './AiSummary'
+import { AiResult } from './AiResult'
 
-const CUSTOM_TAGS = ['ai-translation', 'ai-explanation', 'ai-summary'] as const
+const CUSTOM_TAGS = [
+  'ai-translation',
+  'ai-explanation',
+  'ai-summary',
+  'result',
+] as const
 type CustomTagName = (typeof CUSTOM_TAGS)[number]
 
 function isCustomTagName(name: string): name is CustomTagName {
@@ -40,6 +46,7 @@ export function MarkdownPreview({ content }: { content: string }) {
           'ai-translation': AiTranslation,
           'ai-explanation': AiExplanation,
           'ai-summary': AiSummary,
+          result: AiResult,
         } as Components
       }
     >
