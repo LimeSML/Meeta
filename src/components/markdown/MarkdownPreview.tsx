@@ -15,7 +15,7 @@ const CUSTOM_TAGS = [
   'ai-summary',
   'result',
 ] as const
-type CustomTagName = (typeof CUSTOM_TAGS)[number]
+export type CustomTagName = (typeof CUSTOM_TAGS)[number]
 
 function isCustomTagName(name: string): name is CustomTagName {
   return (CUSTOM_TAGS as readonly string[]).includes(name)
@@ -37,15 +37,45 @@ function remarkMyDirectives() {
   }
 }
 
-export function MarkdownPreview({ content }: { content: string }) {
+interface MarkdownPreviewProps {
+  content: string
+  onApplyAI: (
+    aiText: string,
+    originalSource: string,
+    tagName: CustomTagName,
+  ) => void
+}
+
+export function MarkdownPreview({ content, onApplyAI }: MarkdownPreviewProps) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkDirective, remarkMyDirectives]}
       components={
         {
-          'ai-translation': AiTranslation,
-          'ai-explanation': AiExplanation,
-          'ai-summary': AiSummary,
+          'ai-translation': (props: any) => (
+            <AiTranslation
+              {...props}
+              onApply={(aiText, source) =>
+                onApplyAI(aiText, source, 'ai-translation')
+              }
+            />
+          ),
+          'ai-explanation': (props: any) => (
+            <AiExplanation
+              {...props}
+              onApply={(aiText, source) =>
+                onApplyAI(aiText, source, 'ai-explanation')
+              }
+            />
+          ),
+          'ai-summary': (props: any) => (
+            <AiSummary
+              {...props}
+              onApply={(aiText, source) =>
+                onApplyAI(aiText, source, 'ai-summary')
+              }
+            />
+          ),
           result: AiResult,
         } as Components
       }

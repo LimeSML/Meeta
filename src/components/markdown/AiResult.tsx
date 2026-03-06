@@ -1,24 +1,26 @@
 import { Sparkles } from 'lucide-react'
+import React from 'react'
 
 export function AiResult({ children }: { children: React.ReactNode }) {
   const isEmpty =
     !children || (typeof children === 'string' && children.trim() === '')
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/30 overflow-hidden shadow-inner">
-      <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100/50 text-slate-400 text-[9px] font-bold uppercase tracking-[0.15em] border-b border-slate-100">
-        <Sparkles
-          className={`w-2.5 h-2.5 ${isEmpty ? 'text-slate-200' : 'text-amber-400'}`}
-        />
-        {isEmpty ? 'No Data' : 'Result'}
+    <div className="mt-4 rounded-lg border border-slate-100 bg-white overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-1">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-50/50 border-b border-slate-100">
+        <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-tight">
+          <Sparkles
+            className={`w-3 h-3 ${isEmpty ? 'text-slate-200' : 'text-slate-400'}`}
+          />
+          AIの回答履歴
+        </div>
       </div>
-      <div className="px-4 py-3 text-sm min-h-[3rem] flex items-center">
+
+      <div className="px-4 py-3 text-slate-800 text-sm leading-relaxed whitespace-pre-wrap prose prose-sm prose-slate max-w-none">
         {isEmpty ? (
-          <span className="text-slate-200 text-xs italic">実行待ち...</span>
+          <span className="text-slate-300 text-xs italic">データなし...</span>
         ) : (
-          <div className="text-slate-700 whitespace-pre-wrap w-full">
-            {children}
-          </div>
+          <div className="w-full">{children}</div>
         )}
       </div>
     </div>

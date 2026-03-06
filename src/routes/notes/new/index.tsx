@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
@@ -8,6 +7,7 @@ import { Save, ChevronLeft, Eye, PenLine, Loader2 } from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
 import { createNoteFn, incrementActivityCountFn } from '#/db/queries'
 import { MarkdownPreview } from '#/components/markdown/MarkdownPreview'
+import type { CustomTagName } from '#/components/markdown/MarkdownPreview'
 
 export const Route = createFileRoute('/notes/new/')({
   component: RouteComponent,
@@ -36,6 +36,32 @@ function RouteComponent() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleApplyAI = (
+    aiText: string,
+    originalSource: string,
+    tagName: CustomTagName,
+  ) => {
+    setContent((prev) => {
+      const escapedSource = originalSource
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        .trim()
+
+      // tagName を変数として正規表現に埋め込む
+      // これにより ai-translation, ai-explanation, ai-summary すべてに対応可能
+      const blockRegex = new RegExp(
+        `(::::${tagName}[\\s\\S]*?${escapedSource}[\\s\\S]*?)\\n::::`,
+        'm',
+      )
+
+      if (!blockRegex.test(prev)) return prev
+
+      return prev.replace(blockRegex, (_, body) => {
+        // 最後に固定で付ける閉じタグも、元の構成を維持するために 4つのコロンにする
+        return `${body.trimEnd()}\n\n:::result\n${aiText}\n:::\n::::`
+      })
+    })
   }
 
   return (
@@ -99,7 +125,7 @@ function RouteComponent() {
             </div>
             <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
               {content ? (
-                <MarkdownPreview content={content} />
+                <MarkdownPreview content={content} onApplyAI={handleApplyAI} />
               ) : (
                 <p className="text-gray-300 text-sm">
                   プレビューが表示されます
