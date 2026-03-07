@@ -44,7 +44,7 @@ export function ContributionGraph({ activities }: { activities: Activity[] }) {
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="flex flex-col gap-1 border-zinc-200 px-2 py-1.5 text-[10px] text-white shadow-md"
+                className="flex flex-col gap-1 border-zinc-200 px-2 py-1.5 text-[10px] bg-slate-800 text-white shadow-md"
               >
                 <span className="font-bold">{count} contributions</span>
                 <span className="font-mono">{displayDate}</span>

@@ -3,11 +3,26 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { Save, ChevronLeft, Eye, PenLine, Loader2 } from 'lucide-react'
+import {
+  Save,
+  ChevronLeft,
+  Eye,
+  PenLine,
+  Loader2,
+  Languages,
+  Lightbulb,
+  AlignLeft,
+} from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
 import { createNoteFn, incrementActivityCountFn } from '#/db/queries'
 import { MarkdownPreview } from '#/components/markdown/MarkdownPreview'
 import type { CustomTagName } from '#/components/markdown/MarkdownPreview'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '#/components/ui/tooltip'
 
 export const Route = createFileRoute('/notes/new/')({
   component: RouteComponent,
@@ -64,6 +79,20 @@ function RouteComponent() {
     })
   }
 
+  const insertAiTag = (tagName: string) => {
+    const tagMap: Record<string, string> = {
+      'ai-translation':
+        '::::ai-translation\nここに翻訳したいテキストを入力\n::::',
+      'ai-explanation':
+        '::::ai-explanation\nここに解説したいテキストを入力\n::::',
+      'ai-summary': '::::ai-summary\nここに要約したいテキストを入力\n::::',
+    }
+
+    setContent((prev) =>
+      prev ? `${prev}\n\n${tagMap[tagName]}` : tagMap[tagName],
+    )
+  }
+
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-4 flex flex-col justify-center">
       <div className="page-wrap flex flex-col h-[88vh] min-h-[700px] bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -106,9 +135,70 @@ function RouteComponent() {
 
         <div className="flex flex-1 overflow-hidden">
           <div className="flex-1 flex flex-col border-r border-gray-100 bg-gray-50/10">
-            <div className="flex items-center gap-2 px-8 pt-4 pb-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
-              <PenLine className="w-3.5 h-3.5" />
-              Editor
+            <div className="flex items-center justify-between px-8 pt-4 pb-2">
+              <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
+                <PenLine className="w-3.5 h-3.5" />
+                エディター
+              </div>
+
+              <TooltipProvider>
+                <div className="flex items-center gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full hover:bg-blue-50 text-blue-400 hover:text-blue-500 transition-colors cursor-pointer"
+                        onClick={() => insertAiTag('ai-translation')}
+                      >
+                        <Languages className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                    >
+                      <p>翻訳ブロックを挿入</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full hover:bg-amber-50 text-amber-400 hover:text-amber-500 transition-colors cursor-pointer"
+                        onClick={() => insertAiTag('ai-explanation')}
+                      >
+                        <Lightbulb className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                    >
+                      <p>解説ブロックを挿入</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full hover:bg-emerald-50 text-emerald-400 hover:text-emerald-500 transition-colors cursor-pointer"
+                        onClick={() => insertAiTag('ai-summary')}
+                      >
+                        <AlignLeft className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                    >
+                      <p>要約ブロックを挿入</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipProvider>
             </div>
             <Textarea
               value={content}
@@ -121,7 +211,7 @@ function RouteComponent() {
           <div className="flex-1 overflow-y-auto flex flex-col bg-white">
             <div className="flex items-center gap-2 px-10 pt-4 pb-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
               <Eye className="w-3.5 h-3.5" />
-              Preview
+              プレビュー
             </div>
             <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
               {content ? (
