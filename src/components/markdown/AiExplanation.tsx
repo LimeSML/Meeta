@@ -3,6 +3,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { fetchServerSentEvents, useChat } from '@tanstack/ai-react'
 import type { CustomTagName } from './MarkdownPreview'
+import ReactMarkdown from 'react-markdown'
 
 const extractText = (node: React.ReactNode): string => {
   if (typeof node === 'string') {
@@ -87,8 +88,10 @@ export function AiExplanation({ children, onApply }: AiExplanationProps) {
                 <Save className="w-3.5 h-3.5" />
               </Button>
             </div>
-            <div className="px-4 py-3 text-slate-800 text-sm leading-relaxed whitespace-pre-wrap prose prose-sm prose-amber max-w-none">
-              {aiResponse}
+            <div className="px-4 py-3">
+              <div className="prose prose-sm prose-amber max-w-none text-slate-800">
+                <ReactMarkdown>{aiResponse}</ReactMarkdown>
+              </div>
             </div>
           </div>
         )}
