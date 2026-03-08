@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTranslateRouteImport } from './routes/api/translate'
 import { Route as ApiSummarizeRouteImport } from './routes/api/summarize'
+import { Route as ApiScanRouteImport } from './routes/api/scan'
 import { Route as ApiExplainRouteImport } from './routes/api/explain'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as NotesNewIndexRouteImport } from './routes/notes/new/index'
 import { Route as NotesIdEditIndexRouteImport } from './routes/notes/$id/edit/index'
 
@@ -32,14 +32,14 @@ const ApiSummarizeRoute = ApiSummarizeRouteImport.update({
   path: '/api/summarize',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiScanRoute = ApiScanRouteImport.update({
+  id: '/api/scan',
+  path: '/api/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiExplainRoute = ApiExplainRouteImport.update({
   id: '/api/explain',
   path: '/api/explain',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesNewIndexRoute = NotesNewIndexRouteImport.update({
@@ -55,8 +55,8 @@ const NotesIdEditIndexRoute = NotesIdEditIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
   '/api/explain': typeof ApiExplainRoute
+  '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/notes/new/': typeof NotesNewIndexRoute
@@ -64,8 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
   '/api/explain': typeof ApiExplainRoute
+  '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/notes/new': typeof NotesNewIndexRoute
@@ -74,8 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/chat': typeof ApiChatRoute
   '/api/explain': typeof ApiExplainRoute
+  '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/notes/new/': typeof NotesNewIndexRoute
@@ -85,8 +85,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/api/chat'
     | '/api/explain'
+    | '/api/scan'
     | '/api/summarize'
     | '/api/translate'
     | '/notes/new/'
@@ -94,8 +94,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/api/chat'
     | '/api/explain'
+    | '/api/scan'
     | '/api/summarize'
     | '/api/translate'
     | '/notes/new'
@@ -103,8 +103,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/api/chat'
     | '/api/explain'
+    | '/api/scan'
     | '/api/summarize'
     | '/api/translate'
     | '/notes/new/'
@@ -113,8 +113,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiChatRoute: typeof ApiChatRoute
   ApiExplainRoute: typeof ApiExplainRoute
+  ApiScanRoute: typeof ApiScanRoute
   ApiSummarizeRoute: typeof ApiSummarizeRoute
   ApiTranslateRoute: typeof ApiTranslateRoute
   NotesNewIndexRoute: typeof NotesNewIndexRoute
@@ -144,18 +144,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSummarizeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/scan': {
+      id: '/api/scan'
+      path: '/api/scan'
+      fullPath: '/api/scan'
+      preLoaderRoute: typeof ApiScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/explain': {
       id: '/api/explain'
       path: '/api/explain'
       fullPath: '/api/explain'
       preLoaderRoute: typeof ApiExplainRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes/new/': {
@@ -177,8 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiChatRoute: ApiChatRoute,
   ApiExplainRoute: ApiExplainRoute,
+  ApiScanRoute: ApiScanRoute,
   ApiSummarizeRoute: ApiSummarizeRoute,
   ApiTranslateRoute: ApiTranslateRoute,
   NotesNewIndexRoute: NotesNewIndexRoute,

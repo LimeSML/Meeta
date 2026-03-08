@@ -12,6 +12,8 @@ import {
   Languages,
   Lightbulb,
   AlignLeft,
+  RefreshCw,
+  Check,
 } from 'lucide-react'
 import { useServerFn } from '@tanstack/react-start'
 import { createNoteFn, incrementActivityCountFn } from '#/db/queries'
@@ -23,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '#/components/ui/tooltip'
+import { fetchServerSentEvents, useChat } from '@tanstack/ai-react'
 
 export const Route = createFileRoute('/notes/new/')({
   component: RouteComponent,
@@ -33,9 +36,37 @@ function RouteComponent() {
   const incrementActivity = useServerFn(incrementActivityCountFn)
   const router = useRouter()
   const navigate = useNavigate()
+
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+
+  const [updateReport, setUpdateReport] = useState<{
+    message: string
+    isLatest: boolean
+  } | null>(null)
+
+  const { sendMessage, isLoading: isChecking } = useChat({
+    connection: fetchServerSentEvents('/api/scan'),
+    onFinish: (message) => {
+      try {
+        const text = message.parts
+          .map((p: any) => p.text || p.content || '')
+          .join('')
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+
+        if (jsonMatch) {
+          const report = JSON.parse(jsonMatch[0])
+          setUpdateReport({
+            message: report.message,
+            isLatest: !report.hasUpdate,
+          })
+        }
+      } catch (error) {
+        console.error('解析失敗:', error)
+      }
+    },
+  })
 
   const handleSave = async () => {
     try {
@@ -63,8 +94,6 @@ function RouteComponent() {
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         .trim()
 
-      // tagName を変数として正規表現に埋め込む
-      // これにより ai-translation, ai-explanation, ai-summary すべてに対応可能
       const blockRegex = new RegExp(
         `(::::${tagName}[\\s\\S]*?${escapedSource}[\\s\\S]*?)\\n::::`,
         'm',
@@ -73,10 +102,19 @@ function RouteComponent() {
       if (!blockRegex.test(prev)) return prev
 
       return prev.replace(blockRegex, (_, body) => {
-        // 最後に固定で付ける閉じタグも、元の構成を維持するために 4つのコロンにする
         return `${body.trimEnd()}\n\n:::result\n${aiText}\n:::\n::::`
       })
     })
+  }
+
+  const handleCheckUpdate = async () => {
+    try {
+      setUpdateReport(null)
+      console.log(content)
+      sendMessage({ content: content })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   const insertAiTag = (tagName: string) => {
@@ -156,7 +194,7 @@ function RouteComponent() {
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
-                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                      className="text-[10px] bg-slate-800 text-white"
                     >
                       <p>翻訳ブロックを挿入</p>
                     </TooltipContent>
@@ -166,7 +204,7 @@ function RouteComponent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 rounded-full hover:bg-amber-50 text-amber-400 hover:text-amber-500 transition-colors cursor-pointer"
+                        className="h-6 w-6 rounded-full hover:bg-amber-50 text-amber-400 cursor-pointer"
                         onClick={() => insertAiTag('ai-explanation')}
                       >
                         <Lightbulb className="w-3.5 h-3.5" />
@@ -174,7 +212,7 @@ function RouteComponent() {
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
-                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                      className="text-[10px] bg-slate-800 text-white"
                     >
                       <p>解説ブロックを挿入</p>
                     </TooltipContent>
@@ -184,7 +222,7 @@ function RouteComponent() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 rounded-full hover:bg-emerald-50 text-emerald-400 hover:text-emerald-500 transition-colors cursor-pointer"
+                        className="h-6 w-6 rounded-full hover:bg-emerald-50 text-emerald-400 cursor-pointer"
                         onClick={() => insertAiTag('ai-summary')}
                       >
                         <AlignLeft className="w-3.5 h-3.5" />
@@ -192,7 +230,7 @@ function RouteComponent() {
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
-                      className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                      className="text-[10px] bg-slate-800 text-white"
                     >
                       <p>要約ブロックを挿入</p>
                     </TooltipContent>
@@ -204,23 +242,118 @@ function RouteComponent() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="メモを書きましょう"
-              className="flex-1 px-8 pt-2 pb-8 resize-none border-none focus-visible:ring-0 text-base leading-relaxed bg-transparent shadow-none placeholder:text-gray-400 placeholder:opacity-100 "
+              className="flex-1 px-8 pt-2 pb-8 resize-none border-none focus-visible:ring-0 text-base leading-relaxed bg-transparent shadow-none"
             />
           </div>
 
-          <div className="flex-1 overflow-y-auto flex flex-col bg-white">
-            <div className="flex items-center gap-2 px-10 pt-4 pb-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
-              <Eye className="w-3.5 h-3.5" />
-              プレビュー
-            </div>
-            <div className="px-10 pt-2 pb-10 prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-pre:bg-gray-900">
-              {content ? (
-                <MarkdownPreview content={content} onApplyAI={handleApplyAI} />
-              ) : (
-                <p className="text-gray-300 text-sm">
-                  プレビューが表示されます
-                </p>
+          {/* 右側：プレビュー */}
+          <div className="flex-1 flex flex-col bg-white">
+            {/* プレビューヘッダー */}
+            <div className="flex items-center justify-between px-10 pt-4 pb-2 border-b border-gray-50 shrink-0">
+              <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
+                <Eye className="w-3.5 h-3.5" />
+                プレビュー
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCheckUpdate}
+                      disabled={isChecking}
+                      className={`h-6 w-6 rounded-full transition-colors cursor-pointer ${
+                        isChecking
+                          ? 'bg-slate-100 text-slate-400'
+                          : 'text-rose-400 hover:text-rose-500 hover:bg-rose-50'
+                      }`}
+                    >
+                      {isChecking ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    className="text-[10px] bg-slate-800 text-white border-none px-2 py-1"
+                  >
+                    <p>{isChecking ? 'スキャン中...' : '技術鮮度をチェック'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>{' '}
+            {/* ← ここでヘッダーを正しく閉じる */}
+            {/* スクロール可能なコンテンツ領域 */}
+            <div className="relative flex-1 overflow-y-auto">
+              {updateReport && (
+                <div className="px-10 pt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div
+                    className={`rounded-xl border overflow-hidden shadow-sm bg-white ${
+                      updateReport.isLatest
+                        ? 'border-slate-200'
+                        : 'border-rose-100'
+                    }`}
+                  >
+                    <div
+                      className={`flex items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-b ${
+                        updateReport.isLatest
+                          ? 'bg-slate-50 text-slate-500 border-slate-200'
+                          : 'bg-rose-50 text-rose-600 border-rose-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <RefreshCw
+                          className={`w-3 h-3 ${updateReport.isLatest ? 'text-slate-400' : 'text-rose-400'}`}
+                        />
+                        AIスキャン
+                      </div>
+                    </div>
+
+                    <div className="px-5 py-4">
+                      <p className="text-[13px] text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
+                        {updateReport.message}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`px-4 py-2 flex justify-end border-t transition-colors ${
+                        updateReport.isLatest
+                          ? 'bg-slate-50/30 border-slate-100'
+                          : 'bg-rose-50/20 border-rose-50'
+                      }`}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setUpdateReport(null)}
+                        className={`h-7 text-[10px] font-bold gap-1.5 cursor-pointer shadow-none border-none transition-all ${
+                          updateReport.isLatest
+                            ? 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                            : 'text-rose-600 hover:bg-rose-50 hover:text-rose-700'
+                        }`}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        確認しました
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               )}
+
+              <div className="px-10 pt-6 pb-10 prose prose-slate max-w-none">
+                {content ? (
+                  <MarkdownPreview
+                    content={content}
+                    onApplyAI={handleApplyAI}
+                  />
+                ) : (
+                  <p className="text-gray-300 text-sm">
+                    プレビューが表示されます
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
