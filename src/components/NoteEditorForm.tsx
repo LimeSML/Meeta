@@ -17,6 +17,7 @@ import {
   AlignLeft,
   Check,
   ChevronLeft,
+  Columns2,
   Eye,
   Image,
   Languages,
@@ -28,6 +29,8 @@ import {
   Save,
 } from 'lucide-react'
 import { useRef, useState } from 'react'
+
+type ViewMode = 'split' | 'edit' | 'preview'
 
 type NoteEditorFormProps = {
   initialTitle: string
@@ -47,6 +50,9 @@ export function NoteEditorForm({
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const [viewMode, setViewMode] = useState<ViewMode>('split')
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadImageServerFn = useServerFn(uploadImageFn)
 
@@ -192,11 +198,11 @@ export function NoteEditorForm({
       <div className="page-wrap flex flex-col h-[88vh] min-h-[700px] bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <header className="w-full bg-white border-b border-gray-200 shrink-0">
           <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full hover:bg-gray-100 h-9 w-9 shrink-0"
+                className="rounded-full hover:bg-gray-100 h-9 w-9 shrink-0 cursor-pointer"
                 onClick={() => window.history.back()}
               >
                 <ChevronLeft className="w-5 h-5 text-gray-500" />
@@ -205,32 +211,71 @@ export function NoteEditorForm({
                 placeholder="タイトルを入力"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-xl font-black border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:bg-transparent pl-4 h-auto w-full max-w-2xl placeholder:text-gray-400 placeholder:opacity-100 transition-all"
+                className="text-xl font-black border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none focus:bg-transparent pl-2 h-auto w-full max-w-2xl placeholder:text-gray-400 truncate transition-all"
               />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {updatedAt && (
-                <span className="text-xs text-slate-400 hidden sm:inline">
-                  更新: {new Date(updatedAt).toLocaleDateString('ja-JP')}
+                <span className="text-[10px] font-medium text-slate-400 hidden lg:inline whitespace-nowrap">
+                  最終更新: {new Date(updatedAt).toLocaleDateString('ja-JP')}
                 </span>
               )}
+
+              <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-lg border border-slate-200/50">
+                <TooltipProvider>
+                  {[
+                    { mode: 'edit', icon: PenLine, label: 'エディター' },
+                    { mode: 'split', icon: Columns2, label: '分割表示' },
+                    { mode: 'preview', icon: Eye, label: 'プレビュー' },
+                  ].map((item) => (
+                    <Tooltip key={item.mode}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-7 w-7 rounded-md transition-all cursor-pointer ${
+                            viewMode === item.mode
+                              ? 'bg-white shadow-sm text-primary'
+                              : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                          }`}
+                          onClick={() => setViewMode(item.mode as ViewMode)}
+                        >
+                          <item.icon className="w-3.5 h-3.5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-[10px] bg-slate-800 border-none">
+                        {item.label}
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </TooltipProvider>
+              </div>
+
+              <div className="w-px h-6 bg-slate-200 hidden sm:block" />
+
               <Button
                 onClick={() => onSave({ title, content })}
                 disabled={isSaving}
+                size="sm"
+                className="h-9 px-4 font-bold rounded-lg shadow-sm bg-primary transition-all gap-2 cursor-pointer"
               >
                 {isSaving ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
-                <span>{isSaving ? '保存中...' : '保存'}</span>
+                <span className="hidden sm:inline">
+                  {isSaving ? '保存中...' : '保存'}
+                </span>
               </Button>
             </div>
           </div>
         </header>
         <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1 flex flex-col border-r border-gray-100 bg-gray-50/10">
+          <div
+            className={`flex-1 flex flex-col border-r border-gray-100 bg-gray-50/10 ${viewMode === 'preview' ? 'hidden' : 'flex'}`}
+          >
             <div className="flex items-center justify-between px-8 pt-4 pb-2">
               <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
                 <PenLine className="w-3.5 h-3.5" />
@@ -350,7 +395,9 @@ export function NoteEditorForm({
             />
           </div>
 
-          <div className="flex-1 flex flex-col bg-white">
+          <div
+            className={`flex-1 flex flex-col bg-white ${viewMode === 'edit' ? 'hidden' : 'flex'}`}
+          >
             <div className="flex items-center justify-between px-10 pt-4 pb-2 border-b border-gray-50 shrink-0">
               <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em]">
                 <Eye className="w-3.5 h-3.5" />
