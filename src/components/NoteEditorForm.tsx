@@ -22,6 +22,7 @@ import {
   Languages,
   Lightbulb,
   Loader2,
+  Network,
   PenLine,
   RefreshCw,
   Save,
@@ -176,10 +177,14 @@ export function NoteEditorForm({
       'ai-explanation':
         '::::ai-explanation\nここに解説したいテキストを入力\n::::',
       'ai-summary': '::::ai-summary\nここに要約したいテキストを入力\n::::',
+      'ai-diagram':
+        '::::ai-diagram\nここに構成図にしたいコードや手順を入力\n::::',
     }
-    setContent((prev) =>
-      prev ? `${prev}\n\n${tagMap[tagName]}` : tagMap[tagName],
-    )
+
+    const newTag = tagMap[tagName]
+    if (!newTag) return
+
+    setContent((prev) => (prev ? `${prev}\n\n${newTag}` : newTag))
   }
 
   return (
@@ -310,6 +315,24 @@ export function NoteEditorForm({
                       className="text-[10px] bg-slate-800 text-white"
                     >
                       <p>要約ブロックを挿入</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full hover:bg-indigo-50 text-indigo-600 cursor-pointer"
+                        onClick={() => insertAiTag('ai-diagram')}
+                      >
+                        <Network className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="text-[10px] bg-slate-800 text-white"
+                    >
+                      <p>図解ブロックを挿入</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>

@@ -14,6 +14,7 @@ import { Route as ApiTranslateRouteImport } from './routes/api/translate'
 import { Route as ApiSummarizeRouteImport } from './routes/api/summarize'
 import { Route as ApiScanRouteImport } from './routes/api/scan'
 import { Route as ApiExplainRouteImport } from './routes/api/explain'
+import { Route as ApiDiagramRouteImport } from './routes/api/diagram'
 import { Route as NotesNewIndexRouteImport } from './routes/notes/new/index'
 import { Route as NotesIdEditIndexRouteImport } from './routes/notes/$id/edit/index'
 
@@ -42,6 +43,11 @@ const ApiExplainRoute = ApiExplainRouteImport.update({
   path: '/api/explain',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDiagramRoute = ApiDiagramRouteImport.update({
+  id: '/api/diagram',
+  path: '/api/diagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NotesNewIndexRoute = NotesNewIndexRouteImport.update({
   id: '/notes/new/',
   path: '/notes/new/',
@@ -55,6 +61,7 @@ const NotesIdEditIndexRoute = NotesIdEditIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/diagram': typeof ApiDiagramRoute
   '/api/explain': typeof ApiExplainRoute
   '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/diagram': typeof ApiDiagramRoute
   '/api/explain': typeof ApiExplainRoute
   '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/diagram': typeof ApiDiagramRoute
   '/api/explain': typeof ApiExplainRoute
   '/api/scan': typeof ApiScanRoute
   '/api/summarize': typeof ApiSummarizeRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api/diagram'
     | '/api/explain'
     | '/api/scan'
     | '/api/summarize'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/diagram'
     | '/api/explain'
     | '/api/scan'
     | '/api/summarize'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/api/diagram'
     | '/api/explain'
     | '/api/scan'
     | '/api/summarize'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiDiagramRoute: typeof ApiDiagramRoute
   ApiExplainRoute: typeof ApiExplainRoute
   ApiScanRoute: typeof ApiScanRoute
   ApiSummarizeRoute: typeof ApiSummarizeRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExplainRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/diagram': {
+      id: '/api/diagram'
+      path: '/api/diagram'
+      fullPath: '/api/diagram'
+      preLoaderRoute: typeof ApiDiagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes/new/': {
       id: '/notes/new/'
       path: '/notes/new'
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiDiagramRoute: ApiDiagramRoute,
   ApiExplainRoute: ApiExplainRoute,
   ApiScanRoute: ApiScanRoute,
   ApiSummarizeRoute: ApiSummarizeRoute,

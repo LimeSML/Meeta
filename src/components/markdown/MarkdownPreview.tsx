@@ -8,11 +8,14 @@ import { AiTranslation } from './AiTranslation'
 import { AiExplanation } from './AiExplanation'
 import { AiSummary } from './AiSummary'
 import { AiResult } from './AiResult'
+import { AiDiagram } from './AiDiagram'
+import { Mermaid } from './Mermaid'
 
 const CUSTOM_TAGS = [
   'ai-translation',
   'ai-explanation',
   'ai-summary',
+  'ai-diagram',
   'result',
 ] as const
 export type CustomTagName = (typeof CUSTOM_TAGS)[number]
@@ -76,7 +79,30 @@ export function MarkdownPreview({ content, onApplyAI }: MarkdownPreviewProps) {
               }
             />
           ),
+          'ai-diagram': (props: any) => (
+            <AiDiagram
+              {...props}
+              onApply={(aiText, source) =>
+                onApplyAI(aiText, source, 'ai-diagram')
+              }
+            />
+          ),
           result: AiResult,
+
+          code({ node, inline, className, children, ...props }: any) {
+            const match = /language-mermaid/.exec(className || '')
+            const chart = String(children).replace(/\n$/, '')
+
+            if (!inline && match) {
+              return <Mermaid chart={chart} />
+            }
+
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            )
+          },
         } as Components
       }
     >

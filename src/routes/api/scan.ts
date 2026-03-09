@@ -33,6 +33,7 @@ export const Route = createFileRoute("/api/scan")({
             "  - `::::ai-translation` (翻訳機能)",
             "  - `::::ai-summary` (要約機能)",
             "  - `::::ai-explanation` (技術解説機能)",
+            "  - `::::ai-diagram`（図解機能）",
             "  - `:::result` (AIの回答出力先)",
             "- 上記ブロックが含まれていること自体を『修正対象』とはしないでください。ただし、ブロック内の**具体的な技術記述**が古い場合は指摘してください。",
             "- ユーザーが意図的に古い技術を解説している（例：『歴史的背景』等の記述がある）場合は hasUpdate: false としてください。",
