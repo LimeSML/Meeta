@@ -1,4 +1,3 @@
-import { BlobServiceClient } from "@azure/storage-blob"
 import type { PublicAccessType } from "@azure/storage-blob";
 import { createServerFn } from "@tanstack/react-start"
 import { getBlobServiceClient } from "./azure-storage";
@@ -15,8 +14,7 @@ export const uploadImageFn = createServerFn({ method: 'POST' })
     const { file } = data
 
     const blobServiceClient = getBlobServiceClient();
-    const containerName = 'images'
-    const containerClient = blobServiceClient.getContainerClient(containerName)
+    const containerClient = blobServiceClient.getContainerClient('images');
 
     await containerClient.createIfNotExists({
       access: 'blob' as PublicAccessType
