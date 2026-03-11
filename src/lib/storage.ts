@@ -1,6 +1,7 @@
 import { BlobServiceClient } from "@azure/storage-blob"
 import type { PublicAccessType } from "@azure/storage-blob";
 import { createServerFn } from "@tanstack/react-start"
+import { getBlobServiceClient } from "./azure-storage";
 
 export const uploadImageFn = createServerFn({ method: 'POST' })
   .inputValidator((formData: FormData) => {
@@ -12,13 +13,8 @@ export const uploadImageFn = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     const { file } = data
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING
 
-    if (!connectionString) {
-      throw new Error('接続文字列が設定されていません')
-    }
-
-    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString)
+    const blobServiceClient = getBlobServiceClient();
     const containerName = 'images'
     const containerClient = blobServiceClient.getContainerClient(containerName)
 
