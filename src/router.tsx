@@ -1,6 +1,10 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 
+if (typeof window === 'undefined') {
+  import('./lib/server-init').then((mod) => mod.initAzureKeyVault())
+}
+
 export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
