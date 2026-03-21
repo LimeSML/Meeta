@@ -89,20 +89,55 @@ export function NoteEditorForm({
     tagName: CustomTagName,
   ) => {
     setContent((prev) => {
-      const escapedSource = originalSource
-        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        .trim()
-      const blockRegex = new RegExp(
-        `(::::${tagName}[\\s\\S]*?${escapedSource}[\\s\\S]*?)\\n::::`,
-        'm',
+      const startTag = `::::${tagName}`
+      const endTag = `::::`
+
+      // まず、全体の中で originalSource が現れる位置を探す
+      // これにより、複数ある同じタグの中から「今AIが処理した中身」を持つブロックを特定できる
+      const sourceIndex = prev.indexOf(originalSource.trim())
+
+      if (sourceIndex === -1) {
+        console.warn('対象のソーステキストが見つかりません。')
+        return prev
+      }
+
+      // sourceIndex より前にある、直近の "::::tagName" を探す
+      const startIndex = prev.lastIndexOf(startTag, sourceIndex)
+
+      if (startIndex === -1) {
+        console.warn(`${startTag} が見つかりません。`)
+        return prev
+      }
+
+      // sourceIndex より後にある、直近の "::::" を探す
+      const nextEndIndex = prev.indexOf(
+        endTag,
+        sourceIndex + originalSource.length,
       )
-      if (!blockRegex.test(prev)) return prev
-      return prev.replace(blockRegex, (_, body) => {
-        return `${body.trimEnd()}\n\n:::result\n${aiText}\n:::\n::::`
-      })
+
+      if (nextEndIndex === -1) {
+        console.warn(`終了タグ ${endTag} が見つかりません。`)
+        return prev
+      }
+
+      // 特定したブロック（startIndex から nextEndIndex まで）を抽出
+      const fullBlock = prev.substring(startIndex, nextEndIndex + endTag.length)
+
+      // 既存の :::result ブロックを掃除し、新しい結果を結合
+      const cleanBlock = fullBlock
+        .replace(/\n*:::result[\s\S]*?:::\n*/g, '\n')
+        .replace(/\s*::::$/, '')
+
+      const newBlock = `${cleanBlock.trimEnd()}\n\n:::result\n${aiText}\n:::\n::::`
+
+      // 元のテキストの該当範囲のみを置換
+      return (
+        prev.substring(0, startIndex) +
+        newBlock +
+        prev.substring(nextEndIndex + endTag.length)
+      )
     })
   }
-
   const handleCheckUpdate = async () => {
     try {
       setUpdateReport(null)
